@@ -81,14 +81,13 @@ matches=[
 	[/^[ ]/gm,"<p>"],								[/\n\n/gm,"<\p>"],				//<p> blocks
 	[/\[:-/gm,"<center>"],							[/-:\]/gm,"</center>"],			//<center> blocks
 	[/\[!\$/gm,"<mathref>"],						[/\$!\]/gm,"</mathref>"],		//<mathref> element (Formula reference)
-	[/\[\[(.*)\((.*?)\)\]/gm,"<a href='$1'>$2</a>"],							//<a> element with label
+	[/\[\[(.*)\]\((.*?)\)\]/gm,"<a href='$1'>$2</a>"],							//<a> element with label
 	[/\[\[(.*)\]\]/gm,"<a href='$1'>$1</a>"],									//<a> element without label
 	[/^\s*\[---\]\s*$/gm,"<hr>"],												//<hr> element
 	[/^\s*\[vvv\]\s*$/gm,"</div> <div class='page'>"],							//<div> element: page break
 	[/\[_/gm,"<sub>"],								[/_\]/gm,"</sub>"],				//<sub> element
 	[/\[\^/gm,"<sup>"],								[/\^\]/gm,"</sup>"],			//<sup> element
-	[/\[\?/gm,"<setting>"],							[/\?\]/gm,"</setting>"],		//<setting> elements
-	[/\[BEEMOVIE\]/gm,"<pre class='beemovie'></pre>"]							//[BEEMOVIE] prints the movie script
+	[/\[\?/gm,"<setting>"],							[/\?\]/gm,"</setting>"]		//<setting> elements
 	];
 
 tableMatches=[
@@ -141,13 +140,6 @@ function handleFileSelect(evt) {
 			tables=document.getElementsByTagName("table");
 			//Handles table elements
 			for (t of tables){ t.innerHTML=processTableContent(t.innerHTML); };
-			//Handles [BEEMOVIE] content
-			for (bm of document.getElementsByClassName("beemovie")){
-				fetch('beemovie.txt')
-					.then(response => response.text())
-					.then((data) => {
-						bm.innerHTML=data;
-					})}
 			cs=0;
 			captions=document.getElementsByClassName("tabCap");
 			for(c of captions){
