@@ -53,6 +53,8 @@ I18N={
 matches=[
 	[/\\\[/gm, "&#91;"],							[/\\\]/gm, "&#93;"],			//Escapes "[" and "]"
 	[/\\x/gm,"&#120;"],								[/\\-/gm,"&#45;"],				//Escapes "x" and "-" for lists
+	[/^\s*\[---\]\s*$/gm,"<hr>"],													//<hr> element
+	[/^\s*\[vvv\]\s*$/gm,"</div> <div class='page'>"],								//<div> element: page break
 	[/\[\*\*\*/gm,"<b><i>"],						[/\*\*\*\]/gm,"</i></b>"],		//<b><i> tags
 	[/\[\*\*/gm,"<b>"],								[/\*\*\]/gm,"</b>"],			//<b> tags
 	[/\[\*/gm,"<i>"],								[/\*\]/gm,"</i>"],				//<i> tags
@@ -77,17 +79,15 @@ matches=[
 	[/\[\{/gm,"<tt>"],								[/\}\]/gm,"</tt>"],				//<tt> tags
 	[/\[x/gm,"<ol>"],								[/x\]/gm, "</li></ol>"],		//Ordered lists		
 	[/\[-/gm,"<ul>"],								[/-\]/gm, "</li></ul>"],		//Unordered lists		
-	[/\s+--\s/gm,"</li><li>"],						[/\s+x\.\s/gm,"</li><li>"],			//List items
+	[/\s+--\s/gm,"</li><li>"],						[/\s+x\.\s/gm,"</li><li>"],		//List items
 	[/^[ ]/gm,"<p>"],								[/\n\n/gm,"<\p>"],				//<p> blocks
 	[/\[:-/gm,"<center>"],							[/-:\]/gm,"</center>"],			//<center> blocks
 	[/\[!\$/gm,"<mathref>"],						[/\$!\]/gm,"</mathref>"],		//<mathref> element (Formula reference)
-	[/\[\[(.*)\]\((.*?)\)\]/gm,"<a href='$1'>$2</a>"],							//<a> element with label
-	[/\[\[(.*)\]\]/gm,"<a href='$1'>$1</a>"],									//<a> element without label
-	[/^\s*\[---\]\s*$/gm,"<hr>"],												//<hr> element
-	[/^\s*\[vvv\]\s*$/gm,"</div> <div class='page'>"],							//<div> element: page break
+	[/\[\[(.*)\]\((.*?)\)\]/gm,"<a href='$1'>$2</a>"],								//<a> element with label
+	[/\[\[(.*)\]\]/gm,"<a href='$1'>$1</a>"],										//<a> element without label
 	[/\[_/gm,"<sub>"],								[/_\]/gm,"</sub>"],				//<sub> element
 	[/\[\^/gm,"<sup>"],								[/\^\]/gm,"</sup>"],			//<sup> element
-	[/\[\?/gm,"<setting>"],							[/\?\]/gm,"</setting>"]		//<setting> elements
+	[/\[\?/gm,"<setting>"],							[/\?\]/gm,"</setting>"]			//<setting> elements
 	];
 
 tableMatches=[
