@@ -1,0 +1,184 @@
+<style>
+pre {display:inline}
+tt {white-space:nowrap}
+mathref{float:right}
+sub, sup{font-size:0.7em}
+table, th, td{border:solid black 1px;border-collapse:collapse;padding:0.5em 1em;
+	page-break-inside: avoid}
+table{margin:auto}
+caption{caption-side:bottom;font-style:italic;margin:0.5em -25%}
+setting{display:none}
+h1{font-size:1.7em}
+h2{font-size:1.4em}
+.lAlign{text-align:left}
+.cAlign{text-align:center}
+.rAlign{text-align:right}
+.title{font-size:2.2em;text-align:center}
+.justify p{text-align:justify}
+
+.page{page-break-inside: avoid;}
+
+@media not print{
+	.page{border-bottom:dotted gray 2px}
+	.dark{background:#202020;color:#e0e0e0}
+	.dark table, .dark th, .dark td{border:solid white 1px}
+}
+@media print{#control{display:none}}
+</style>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['[$', '$]'], ['\\(', '\\)']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<div id="control">
+<form enctype="multipart/form-data" style="display:inline">
+<input id="upload" type=file accept=".txt,.mdp,.md" name="files[]" size=30></input>
+</form>
+<button onclick="toggleDarkMode()">Dark/Light mode</button>
+</div>
+<div id="content"></div>
+<script defer>
+I18N={
+	"FIGURE": "Figure",
+	"TABLE": "Table",
+}
+
+matches=[
+	[/\\\[/gm, "&#91;"],							[/\\\]/gm, "&#93;"],			//Escapes "[" and "]"
+	[/\\x/gm,"&#120;"],								[/\\-/gm,"&#45;"],				//Escapes "x" and "-" for lists
+	[/\[\*\*\*/gm,"<b><i>"],						[/\*\*\*\]/gm,"</i></b>"],		//<b><i> tags
+	[/\[\*\*/gm,"<b>"],								[/\*\*\]/gm,"</b>"],			//<b> tags
+	[/\[\*/gm,"<i>"],								[/\*\]/gm,"</i>"],				//<i> tags
+	[/\[\|\|/gm,"<table><tr><th>"],					[/\[\|/gm,"<table><tr><td>"],	//<table> elements: start with th/td
+	[/\|\|\]/gm,"</th></tr></table>"],				[/\|\]/gm,"</td></tr></table>"],//<table> elements: end
+	[/\[-\|/gm,"<span class='tabCap'>"],			[/\|-\]/gm,"</span>"],			//<caption> element for tables
+	[/\[#\|/gm,"<span class='numbered tabCap'>"],	[/\|#\]/gm,"</span>"],			//<caption> element for tables
+	[/\[=!/gm,"<h1 class='title'>"],				[/!=\]/gm,"</h1>"],				//<h1> tags: title
+	[/\[======/gm,"<h6 class='heading'>"],			[/======\]/gm,"</h6>"],			//<h6> tags
+	[/\[=====/gm,"<h5 class='heading'>"],			[/=====\]/gm,"</h5>"],			//<h5> tags
+	[/\[====/gm,"<h4 class='heading'>"],			[/====\]/gm,"</h4>"],			//<h4> tags
+	[/\[===/gm,"<h3 class='heading'>"],				[/===\]/gm,"</h3>"],			//<h3> tags
+	[/\[==/gm,"<h2 class='heading'>"],				[/==\]/gm,"</h2>"],				//<h2> tags
+	[/\[=/gm,"<h1 class='heading'>"],				[/=\]/gm,"</h1>"],				//<h1> tags
+	[/\[######/gm,"<h6 class='numbered heading'>"],	[/######\]/gm,"</h6>"],			//<h6> tags: numbered
+	[/\[#####/gm,"<h5 class='numbered heading'>"],	[/#####\]/gm,"</h5>"],			//<h5> tags: numbered
+	[/\[####/gm,"<h4 class='numbered heading'>"],	[/####\]/gm,"</h4>"],			//<h4> tags: numbered
+	[/\[###/gm,"<h3 class='numbered heading'>"],	[/###\]/gm,"</h3>"],			//<h3> tags: numbered
+	[/\[##/gm,"<h2 class='numbered heading'>"],		[/##\]/gm,"</h2>"],				//<h2> tags: numbered
+	[/\[#/gm,"<h1 class='numbered heading'>"],		[/#\]/gm,"</h1>"],				//<h1> tags: numbered
+	[/\[\{\{/gm,"<pre>"],							[/\}\}\]/gm,"</pre>"],			//<pre> block
+	[/\[\{/gm,"<tt>"],								[/\}\]/gm,"</tt>"],				//<tt> tags
+	[/\[x/gm,"<ol>"],								[/x\]/gm, "</li></ol>"],		//Ordered lists		
+	[/\[-/gm,"<ul>"],								[/-\]/gm, "</li></ul>"],		//Unordered lists		
+	[/\s--\s/gm,"</li><li>"],						[/\sx\.\s/gm,"</li><li>"],			//List items
+	[/^[ ]/gm,"<p>"],								[/\n\n/gm,"<\p>"],				//<p> blocks
+	[/\[:-/gm,"<center>"],							[/-:\]/gm,"</center>"],			//<center> blocks
+	[/\[!\$/gm,"<mathref>"],						[/\$!\]/gm,"</mathref>"],		//<mathref> element (Formula reference)
+	[/\[\[(.*)\((.*?)\)\]/gm,"<a href='$1'>$2</a>"],							//<a> element with label
+	[/\[\[(.*)\]\]/gm,"<a href='$1'>$1</a>"],									//<a> element without label
+	[/^\s*\[---\]\s*$/gm,"<hr>"],												//<hr> element
+	[/^\s*\[vvv\]\s*$/gm,"</div> <div class='page'>"],							//<div> element: page break
+	[/\[_/gm,"<sub>"],								[/_\]/gm,"</sub>"],				//<sub> element
+	[/\[\^/gm,"<sup>"],								[/\^\]/gm,"</sup>"],			//<sup> element
+	[/\[\?/gm,"<setting>"],							[/\?\]/gm,"</setting>"],		//<setting> elements
+	[/\[BEEMOVIE\]/gm,"<pre class='beemovie'></pre>"]							//[BEEMOVIE] prints the movie script
+	];
+
+tableMatches=[
+	[/\|\|$/gm,"</th></tr>"],	[/\|\|/gm,"</th><th>"],											//<th>
+	[/^\s*\| :-- /gm,"<tr><td class='lAlign'>"],	[/\| :--/gm,"</td><td class='lAlign'>"],	//<td> left-aligned
+	[/^\s*\| :-: /gm,"<tr><td class='cAlign'>"],	[/\| :-:/gm,"</td><td class='cAlign'>"],	//<td> center-aligned
+	[/^\s*\| --: /gm,"<tr><td class='rAlign'>"],	[/\| --:/gm,"</td><td class='rAlign'>"],	//<td> right-aligned
+	[/^\s*\|/gm,"<tr><td>"],						[/\|\s*$/gm,"</td></tr>"],					//<td> at start/end
+	[/\|/gm,"</td><td>"],																		//<td>
+	];
+
+function toggleDarkMode(){
+	if(document.body.classList.contains("dark"))document.body.classList.remove("dark");
+	else document.body.classList.add("dark");
+}
+
+function processContent(c){
+	for(match of matches){
+		c=c.replace(match[0],match[1]);
+	}
+	return c;
+}
+
+function processTableContent(c){
+	for(match of tableMatches){
+		c=c.replace(match[0],match[1]);
+	}
+	return c;
+}
+
+function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+    f = files[0];
+    var reader = new FileReader();
+
+    // Closure to capture the file information.
+	reader.onload = (function(theFile) {
+		return function(e) {
+			c=processContent(e.target.result);
+			document.getElementById("content").innerHTML="<div class='page'>"+c+"</div>";
+			MathJax.typeset();
+			
+			//Handle options
+			settings={}
+			for(s of document.getElementsByTagName("setting")){
+				setting=s.innerHTML.split("=");
+				settings[setting[0]]=setting[1];
+			}
+			
+			tables=document.getElementsByTagName("table");
+			//Handles table elements
+			for (t of tables){ t.innerHTML=processTableContent(t.innerHTML); };
+			//Handles [BEEMOVIE] content
+			for (bm of document.getElementsByClassName("beemovie")){
+				fetch('beemovie.txt')
+					.then(response => response.text())
+					.then((data) => {
+						bm.innerHTML=data;
+					})}
+			cs=0;
+			captions=document.getElementsByClassName("tabCap");
+			for(c of captions){
+				t=c.previousElementSibling;
+				if(t.tagName=="TABLE"){
+					newC=document.createElement("caption");
+					if(c.classList.contains("numbered")){
+						cs+=1;
+						c.innerHTML=I18N["TABLE"]+" "+cs+": "+c.innerHTML;}
+					newC.innerHTML=c.innerHTML;
+					t.insertBefore(newC,t.firstElementChild);
+					c.style.display="none";
+				}
+			}
+			hLevels=[0,0,0,0,0,0]
+			ll=6;
+			for(h of document.getElementsByClassName("heading")){
+				if(h.classList.contains("numbered")){
+					l=parseInt(h.tagName.substring(1));
+					if(l<ll){for(i=l;i<6;i++){hLevels[i]=0}}
+					ll=l;
+					hLevels[l-1]+=1;
+					h.innerHTML=hLevels.join(". ").substring(0,l*3)+h.innerHTML;
+				}
+			}
+			
+			if(settings["justify"]=="true")document.getElementById("content").classList.add("justify");
+		};
+	})(f);
+	reader.readAsText(f);
+}
+
+document.getElementById('upload').addEventListener('change', handleFileSelect, false);
+</script>
