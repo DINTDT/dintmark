@@ -6,24 +6,51 @@ sub, sup{font-size:0.7em}
 table, th, td{border:solid black 1px;border-collapse:collapse;padding:0.5em 1em;
 	page-break-inside: avoid}
 table{margin:auto}
-caption{caption-side:bottom;font-style:italic;margin:0.5em -25%}
+caption, figcaption{caption-side:bottom;font-style:italic;margin:0.5em -25%}
+figure{display:inline-block}
 setting{display:none}
 h1{font-size:1.7em}
 h2{font-size:1.4em}
+quote{display:block;margin-left:2em;border-left:0.2em lightgray solid;padding:0.5em}
+
+td.th{text-align:center;font-weight:bold;}
+a.figure{color:initial;text-decoration:none}
+
 .lAlign{text-align:left}
 .cAlign{text-align:center}
 .rAlign{text-align:right}
 .title{font-size:2.2em;text-align:center}
 .justify p{text-align:justify}
-
 .page{page-break-inside: avoid;}
+
+#headerFooter, #headerFooter > *{border:hidden}
+#headerFooter>tbody>tr>td{padding:0}
+#control{height:10mm}
+#header{border:lightgreen 1px dashed;width:100%;}
+#footer{border:red 1px dotted;width:100%;}
+#pageNumber::after{content:counter(page) "/" counter(pages)}
+#pageNumber.tl, #pagenumber.bl {float:left}
+#pageNumber.tc, #pagenumber.bc {float:center}
+#pageNumber.tr, #pagenumber.br {float:right}
 
 @media not print{
 	.page{border-bottom:dotted gray 2px}
 	.dark{background:#202020;color:#e0e0e0}
 	.dark table, .dark th, .dark td{border:solid white 1px}
 }
-@media print{#control{display:none}}
+@media print{
+	.hasHeader #header-table{display:table-header-group}
+	.hasFooter #footer-table{display:table-footer-group}
+	.hasFooter #footer{position:fixed;bottom:0;left:0;border-style:hidden}
+	.hasHeader #header{position:fixed;top:0;left:0;border-style:hidden}
+	#control{display:none}
+}
+@page{
+	size:letter;
+	margin:20mm 20mm 20mm 20mm;
+	counter-reset:1;
+	counter-increment:page;
+}
 </style>
 <script>
 MathJax = {
@@ -38,12 +65,16 @@ MathJax = {
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <div id="control">
-<form enctype="multipart/form-data" style="display:inline">
-<input id="upload" type=file accept=".txt,.mdp,.md" name="files[]" size=30></input>
-</form>
-<button onclick="toggleDarkMode()">Dark/Light mode</button>
+	<form enctype="multipart/form-data" style="display:inline">
+		<input id="upload" type=file accept=".txt,.mdp,.md" name="files[]" size=30></input>
+	</form>
+	<button onclick="toggleDarkMode()">Dark/Light mode</button>
 </div>
-<div id="content"></div>
+<table id="headerFooter">
+	<thead id='header-table'><tr><td><div id="header-space"></div></td></tr></thead>
+	<tbody><tr><td><div id="content"></div></td></tr></tbody>
+	<tfoot id="footer-table"><tr><td><div id="footer-space"></div></td></tr></tfoot>
+</table>
 <script defer>
 I18N={
 	"FIGURE": "Figure",
@@ -58,8 +89,8 @@ matches=[
 	[/\[\*\*\*/gm,"<b><i>"],						[/\*\*\*\]/gm,"</i></b>"],		//<b><i> tags
 	[/\[\*\*/gm,"<b>"],								[/\*\*\]/gm,"</b>"],			//<b> tags
 	[/\[\*/gm,"<i>"],								[/\*\]/gm,"</i>"],				//<i> tags
-	[/\[\|\|/gm,"<table><tr><th>"],					[/\[\|/gm,"<table><tr><td>"],	//<table> elements: start with th/td
-	[/\|\|\]/gm,"</th></tr></table>"],				[/\|\]/gm,"</td></tr></table>"],//<table> elements: end
+	[/\[\|\|/gm,"<table><tr><td class='th'>"],		[/\[\|/gm,"<table><tr><td>"],	//<table> elements: start with th/td
+	[/\|\|\]/gm,"</td></tr></table>"],				[/\|\]/gm,"</td></tr></table>"],//<table> elements: end
 	[/\[-\|/gm,"<span class='tabCap'>"],			[/\|-\]/gm,"</span>"],			//<caption> element for tables
 	[/\[#\|/gm,"<span class='numbered tabCap'>"],	[/\|#\]/gm,"</span>"],			//<caption> element for tables
 	[/\[=!/gm,"<h1 class='title'>"],				[/!=\]/gm,"</h1>"],				//<h1> tags: title
@@ -75,6 +106,7 @@ matches=[
 	[/\[###/gm,"<h3 class='numbered heading'>"],	[/###\]/gm,"</h3>"],			//<h3> tags: numbered
 	[/\[##/gm,"<h2 class='numbered heading'>"],		[/##\]/gm,"</h2>"],				//<h2> tags: numbered
 	[/\[#/gm,"<h1 class='numbered heading'>"],		[/#\]/gm,"</h1>"],				//<h1> tags: numbered
+	[/\["/gm,"<quote>"],							[/"\]/gm,"</quote>"],			//<quote> tags
 	[/\[\{\{/gm,"<pre>"],							[/\}\}\]/gm,"</pre>"],			//<pre> block
 	[/\[\{/gm,"<tt>"],								[/\}\]/gm,"</tt>"],				//<tt> tags
 	[/\[x/gm,"<ol>"],								[/x\]/gm, "</li></ol>"],		//Ordered lists		
@@ -85,13 +117,20 @@ matches=[
 	[/\[!\$/gm,"<mathref>"],						[/\$!\]/gm,"</mathref>"],		//<mathref> element (Formula reference)
 	[/\[\[(.*)\]\((.*?)\)\]/gm,"<a href='$1'>$2</a>"],								//<a> element with label
 	[/\[\[(.*)\]\]/gm,"<a href='$1'>$1</a>"],										//<a> element without label
+	[/\[!\[(.*)\]\[%(.*)%\]!\]/gm,
+		"<figure><img src='$1' style='width:$2%;height:auto'></img></figure>"],		//<img> element: scaled
+	[/\[!\[(.*)\]!\]/gm,"<figure><img src='$1'></img></figure>"],					//<img> element
 	[/\[_/gm,"<sub>"],								[/_\]/gm,"</sub>"],				//<sub> element
 	[/\[\^/gm,"<sup>"],								[/\^\]/gm,"</sup>"],			//<sup> element
-	[/\[\?/gm,"<setting>"],							[/\?\]/gm,"</setting>"]			//<setting> elements
+	[/\[\?/gm,"<setting>"],							[/\?\]/gm,"</setting>"],		//<setting> elements
+	[/\[F\|/gm,"<div id='footer'>"],				[/\|F\]/gm,"</div>"],			//FOOTER content
+	[/\[H\|/gm,"<div id='header'>"],				[/\|H\]/gm,"</div>"],			//HEADER content
+	[/[ ][ ]$/gm,"<br>"]
 	];
 
+
 tableMatches=[
-	[/\|\|$/gm,"</th></tr>"],	[/\|\|/gm,"</th><th>"],											//<th>
+	[/\|\|$/gm,"</td></tr>"],	[/\|\|/gm,"</td><td class='th'>"],								//<th>
 	[/^\s*\| :-- /gm,"<tr><td class='lAlign'>"],	[/\| :--/gm,"</td><td class='lAlign'>"],	//<td> left-aligned
 	[/^\s*\| :-: /gm,"<tr><td class='cAlign'>"],	[/\| :-:/gm,"</td><td class='cAlign'>"],	//<td> center-aligned
 	[/^\s*\| --: /gm,"<tr><td class='rAlign'>"],	[/\| --:/gm,"</td><td class='rAlign'>"],	//<td> right-aligned
@@ -99,22 +138,19 @@ tableMatches=[
 	[/\|/gm,"</td><td>"],																		//<td>
 	];
 
+MM=document.getElementById("control").offsetHeight/10;
 function toggleDarkMode(){
 	if(document.body.classList.contains("dark"))document.body.classList.remove("dark");
 	else document.body.classList.add("dark");
 }
 
 function processContent(c){
-	for(match of matches){
-		c=c.replace(match[0],match[1]);
-	}
+	for(match of matches){c=c.replace(match[0],match[1]);}
 	return c;
 }
 
 function processTableContent(c){
-	for(match of tableMatches){
-		c=c.replace(match[0],match[1]);
-	}
+	for(match of tableMatches){c=c.replace(match[0],match[1]);}
 	return c;
 }
 
@@ -139,21 +175,38 @@ function handleFileSelect(evt) {
 			
 			tables=document.getElementsByTagName("table");
 			//Handles table elements
+			tables = [].slice.call(tables);
+			tables.shift();
 			for (t of tables){ t.innerHTML=processTableContent(t.innerHTML); };
-			cs=0;
+			//Handles captions
+			csT=0; csI=0;
 			captions=document.getElementsByClassName("tabCap");
 			for(c of captions){
 				t=c.previousElementSibling;
-				if(t.tagName=="TABLE"){
+				if(t&&t.tagName=="TABLE"){
 					newC=document.createElement("caption");
 					if(c.classList.contains("numbered")){
-						cs+=1;
-						c.innerHTML=I18N["TABLE"]+" "+cs+": "+c.innerHTML;}
+							csT+=1; c.innerHTML=I18N["TABLE"]+" "+csT+": "+c.innerHTML;}
 					newC.innerHTML=c.innerHTML;
-					t.insertBefore(newC,t.firstElementChild);
-					c.style.display="none";
+					t.insertBefore(newC,t.firstElementChild);}
+				else if(t&&(t.tagName=="FIGURE"||t.tagName=="A")){
+					if(t.tagName=="A" && t.firstElementChild && t.firstElementChild.tagName=="FIGURE"){
+						t.classList.add("figure");
+						t=t.firstElementChild;
+						}
+					newC=document.createElement("figcaption");
+					if(c.classList.contains("numbered")){
+							csI+=1; c.innerHTML=I18N["FIGURE"]+" "+csI+": "+c.innerHTML;}
+					newC.innerHTML=c.innerHTML;
+					t.appendChild(newC);
 				}
+				c.style.display="none";
 			}
+			
+					
+						
+						
+			//Add numbering to numbered headings
 			hLevels=[0,0,0,0,0,0]
 			ll=6;
 			for(h of document.getElementsByClassName("heading")){
@@ -166,6 +219,28 @@ function handleFileSelect(evt) {
 				}
 			}
 			
+			//Handles Header and FOOTER
+			h=document.getElementById("header");
+			f=document.getElementById("footer");
+			if(h){
+				hs=document.getElementById("header-space");
+				hs.style.height=h.offsetHeight;
+				document.body.classList.add("hasHeader");
+			}
+			if(f){
+				fs=document.getElementById("footer-space");
+				fs.style.height=f.offsetHeight+"px";
+				document.body.classList.add("hasFooter");
+			}
+			/* Handles page numbers - currently does not work
+			if(settings["pageNumbers"]){
+				pn=document.createElement("span");
+				pn.id="pageNumber";
+				pn.classList.add(settings["pageNumbers"]);
+				if(settings["pageNumbers"][0]=="t")document.getElementById("header").appendChild(pn);
+				else if(settings["pageNumbers"][0]=="b")document.getElementById("footer").appendChild(pn);
+			}
+			*/
 			if(settings["justify"]=="true")document.getElementById("content").classList.add("justify");
 		};
 	})(f);
