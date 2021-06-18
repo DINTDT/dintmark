@@ -77,7 +77,7 @@ matches=[
 	[/\[\{/gm,"<tt>"],								[/\}\]/gm,"</tt>"],				//<tt> tags
 	[/\[x/gm,"<ol>"],								[/x\]/gm, "</li></ol>"],		//Ordered lists		
 	[/\[-/gm,"<ul>"],								[/-\]/gm, "</li></ul>"],		//Unordered lists		
-	[/\s--\s/gm,"</li><li>"],						[/\sx\.\s/gm,"</li><li>"],			//List items
+	[/\s+--\s/gm,"</li><li>"],						[/\s+x\.\s/gm,"</li><li>"],			//List items
 	[/^[ ]/gm,"<p>"],								[/\n\n/gm,"<\p>"],				//<p> blocks
 	[/\[:-/gm,"<center>"],							[/-:\]/gm,"</center>"],			//<center> blocks
 	[/\[!\$/gm,"<mathref>"],						[/\$!\]/gm,"</mathref>"],		//<mathref> element (Formula reference)
