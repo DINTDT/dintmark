@@ -1,80 +1,92 @@
 [?justify=true?]
 [?pageNumbers=br?]
+[?language=english?]
 
-[=!DINTMark [^v1.4^]!=]
+[=!DINTMark [^v1.5^]!=]
 
 [#Introduction#]
- [**DINTMark**] is a markup notation system designed to allow for easy
-formatting of plain text, similarly to Markdown. The reason for developing a
-new system is mainly to extend Markdown's functionality, especially in the
-formatting aspect of things.
- DINTMark is designed with HTML in mind: That is, the syntax has been
+ [**DINTMark**] is a markup notation system designed for easy formatting of
+plain text, similarly to Markdown. The reason for developing a new system is
+mainly to extend Markdown's functionality, especially in the formatting aspect
+of things.
+ [*DINTMark*] is designed with HTML in mind: that is, the syntax has been
 designed to be easily transformed into HTML tags, by use of [*regex*] or
 similar tools.
- To use [*DINTMark*], a parser is needed. A working parser made by the author of
-this document can be found [[https://dintdt.github.io/dintmark/dintmark-parser.html](here)].
+ To use [*DINTMark*], a parser is needed. A working parser made by the author
+of this document can be found
+[[https://dintdt.github.io/dintmark/dintmark-parser.html](here)].
 
 [##Parser##]
  This particular parser has a control bar at the top of the page. It has a
 button with which to upload the source file. The [{Dark/Light mode}] button will
-toggle between a white-background/black-text and dark-background/white-text.
-The control bar will not be printed. Even if Dark mode is toggled, the printed
+toggle between a white-background/black-text and a dark-background/white-text.
+ The control bar will not be printed. Even if Dark mode is toggled, the printed
 document will have a white background and black text.
  The expected use of this parser is to render the document through the browser
 and use the browser's own Print function to either print the file or export it
 to PDF.
 
 [#Syntax#]
- To start a [*paragraph*], a line must begin with a [*single space*]. By default,
-paragraphs end when a new block element begins, so no special mark is used when
-the paragraph is to be closed.
- Text formatting is done by encasing a section of text in square brackets,
-and a combination of characters following the opening bracket and preceding the
-closing bracket. For example, the plain text [{\[XY text XY\]}] would have the
-format indicated by [{XY}] in this documentation.
- The following character combinations are allowed, followed by the effect
-they have:
+ To start a [*paragraph*], a line must begin with a [*single space*]. No marking
+is used to close a paragraph. When you need a line break without creating a new
+paragraph, end a line with [*two*] spaces.  
+This line, for example, is part of the same paragraph block as the previous line.
+ Text formatting is done by encasing a section of text in [*markings*], which are
+a combination of characters following an opening bracket and preceding a closing
+bracket.
+ For the sake of formality, note that in each example or syntax definition, the
+text to be formatted is represented by the word [{TEXT}].
+ The following markings are used for general formatting:
 [-
-	-- [{\[*xxx*\]}] causes text to be displayed as [*italics*].
-	-- [{\[**xxx**\]}] causes text to be displayed as [**bold**].
-	-- [{\[***xxx***\]}] causes text to be displayed as both
+	-- [{\[*TEXT*\]}] causes text to be displayed as [*italics*].
+	-- [{\[**TEXT**\]}] causes text to be displayed as [**bold**].
+	-- [{\[***TEXT***\]}] causes text to be displayed as both
 		[*** bold and italics ***]
-	-- [{\[:-xxx-:\]}] causes the paragraph to be centered horizontally.
-	-- [{\[_xxx_\]}] displays a text as a [_subscript_]
-	-- [{\[^xxx^\]}] displays a text as a [^superscript^]
+	-- [{\[_TEXT_\]}] displays a text as a [_subscript_]
+	-- [{\[^TEXT^\]}] displays a text as a [^superscript^]
+	-- [{\[{TEXT}\]}] displays a text as [{monospace}]
+	-- [{\[+TEXT+\]}] displays a text as [+small caps+]
+	-- [{\[~TEXT~\]}] displays text as [~strikethrough~]
 -]
- There are some formatting options that do not have content. The following is a
-list of there formatting options:
+
+ Some markings affect text [*as a block*] as opposed to [*inline*]:
+[-	-- [{\[:-:TEXT:-:\]}] causes the paragraph to be centered horizontally.
+	-- [{\[{{TEXT}}\]}] creates a [{&lt;pre&gt;}] block, which is rendered with
+	[{monospace}] text.
+-]
+
+ The following markings do not encase text, as they are meant to format the flow
+of the text rather than the content. The following is a list of these markings:
 [-
-	-- [{\[---\]}] shows a horizontal bar that denotes a break in content. Is
-		displayed as a [{&lt;hr&gt;}] element.
+	-- [{\[---\]}] shows a horizontal bar that denotes a break in content. It is
+		displayed as an [{&lt;hr&gt;}] element.
 	-- [{\[vvv\]}] denotes a page break. It is shown as a dotted line on the
-		document, but it will not be shown when printing.
+		browser display, but it will not be shown when printing.
 -]
+
+ Note that some syntax definitions contain some spaces. In those cases, the space
+character is required.
 
 [##Headings##]
  There are a total of 6 heading levels. They are meant to indicate where a
 section starts. A heading must be in a single line, and must follow this syntax:
-[-
-	-- [{\[=Heading Level 1=\]}]
-	-- [{\[==Heading Level 2==\] }]
-	-- [{\[===Heading Level 3===\] }]
-	-- and so on. The number of [{=}]s on each side indicate the heading level.
--]
- Alternatively, [{#}] can be used instead of [{=}] to make the headings be
+[:-:[{\[=TEXT=\]}]:-:]
+ This would display a level-1 heading. To increase the heading level, increase
+the number of "[{=}]" [**at both sides**].
+ Alternatively, "[{#}]" can be used instead of "[{=}]" to make the headings be
 preceded by numbers. This document uses numbered headings.
  A special heading can be used for the title of the document. Notice that the
 title of this document has a larger font than the level-1 headings, and that it
 is centered. To use this heading, use the following syntax:
-[:-[{\[=!TITLE!=\]}]-:]
- There is no [{\[#!TITLE!#\]}] syntax, as the title is never expected to be
-numbered.
+[:-:[{\[=!TEXT!=\]}]:-:]
+ Since the title of the document is not expected to be numbered, no numbered
+variation is supported.
 
 [##Links##]
  Hyperlinks can be embedded into the document using the following syntax:
- [:-[{\[\[URL\](LABEL)\]}] or [{\[\[URL\]\]}]-:]
- where [{URL}] would be the link to follow, and [{LABEL}] would be the text that
-is displayed instead of the raw url.
+[:-:[{\[\[URL\](LABEL)\]}] or [{\[\[URL\]\]}]:-:]
+where [{URL}] is the hyperlink address, and [{LABEL}] is the text that is
+displayed instead of the raw url.
  If the [{\[\[URL\]\]}] syntax is used, the raw url will be displayed instead of
 a label.
 
@@ -82,38 +94,41 @@ a label.
  A hyperlink can be specified to be an image. In that case, the image will be
 displayed instead of being linked to. To embed an image into the document, use
 the following syntax:
- [:-[{\[!\[URL\]!\]}]-:]
+[:-:[{\[!\[URL\]!\]}]:-:]
  For example, the following is one of the logos of github, embedded using this
 syntax:
- [:-[[https://github.com]([![https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png][%50%]!])]
-[#|Images can be used as the label of a regular link. This image of Octocat links to GitHub! |#]-:]
+ [[https://github.com]([![https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png][%25%]!])]
+[#|Images can be used as the label of a regular link. This image of Octocat links to GitHub! |#]
+ Note that images are centered horizontally by default.
 
- Images can have captions. Add [{\[-| CAPTION -|\]}] [**immediately**] after an
-image or after the link that uses an image as a label to add a caption. Make sure
-not to begin a paragraph by accident by adding a space at the beginning of the
-line.
- Captions can be numbered automatically. Use [{\[#|xxx|#\]}] instead of [{\[-|xxx|-\]}] to
-have the caption begin with "[*Figure X.*]". [*X*] will be replaced by its
-corresponding number.
+[####Captions####]
+ Images can have captions. Add [{\[-|TEXT-|\]}] [**immediately**] after an
+image (or after a hyperlink that uses an image as a label) to add a caption.
+Make sure not to begin a paragraph by accident by adding a space at the
+beginning of the line.
+ Captions can be numbered automatically. Use [{\[#|TEXT|#\]}] instead of
+[{\[-|TEXT|-\]}] to have the caption begin with "[*Figure X.*]". [*X*] will be
+replaced by its corresponding number.
  Note that when an image is the label of a link, the caption is also part of the
 hyperlink. The provided parser styles the captions to look like regular text.
-Image can be scaled using the following syntax:
- [:-[{\[!\[ IMG-URL \]\[% SCALE %\]\!\]}]-:]
- The same image from before (which was already scaled to 50%), scaled
+
+[####Scale####]
+ Images can be scaled using the following syntax:
+[:-:[{\[!\[URL\]\[%SCALE%\]!\]}]:-:]
+where [{SCALE}] is any positive number.
+ The same image from before (which was already scaled to 25%), scaled
 differently, looks like this:
-[:-[![https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png][%25%]!]
-[#|Octocat image, scaled to 25% using [{\[%25%\]}]|#]-:]
-[:-[![https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png][%12.5%]!]
-[#|Octocat image, scaled to 12.5% using [{\[%12.5%\]}]|#]-:]
+[![https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png][%12.5%]!]
+[#|Octocat image, scaled to 12.5% using [{\[%12.5%\]}]|#]
 
 [##Quote blocks##]
  Quote blocks can be added using the following syntax:
-[:-[{\["TEXT"\]}]-:]
+[:-:[{\["TEXT"\]}]:-:]
 and it is rendered as follows:
- [" This is a quote block."]
- Instead of using the blockquote element of HTML, it uses a quote element with
-the "display:block" style applied to it. This is done for because blockquote
-elementes do not render properly when printing.
+[" This is a quote block."]
+ The provided parser uses a [{&lt;quote&gt;}] element with the "[{display:block}]"
+style applied to it. This is done because [{&lt;blockquote&gt;}] elementes do
+not render properly when printing.
 
 [## Lists ##]
  Lists can be either [*ordered*] or [*unordered*].
@@ -127,11 +142,15 @@ increases as the elements go on. An ordered list follows this syntax:
 	\x. Note that all of these lines begin with a TAB space.
 	\x. This is the last element. It ends with a specific character combination. x\]
 }}]
+
  The given example renders like this:
 [x	x. This is the first element of the list.
 	x. This is the second element.
 	x. Note that all of these lines begin with a TAB space.
 	x. This is the last element. It ends with a specific character combination. x]
+
+ While the example is neatly organized, each [{\x.}] only requires one blank
+space at both sides.
 
 [### Unordered Lists ###]
  Unordered lists have each element preceded by a bullet point. An unordered
@@ -142,64 +161,108 @@ list follows this syntax:
 	\-- Note that all of these lines begin with a TAB space.
 	\-- This is the last element. It ends with a specific character combination. -\]
 }}]
+
  The given example renders like this:
 [-	-- This is an element of the list.
 	-- This is another element.
 	-- Note that all of these lines begin with a TAB space.
 	-- This is the last element. It ends with a specific character combination. -]
- Note that each [{--}] must have a space at both sides.
+
+ While the example is neatly organized, each [{\--}] only requires one blank
+space at both sides.
 
 [##Math##]
- [**DINTMark**] uses [*MathJax*] to render mathematical formulas. This
+ [*DINTMark*] uses [*MathJax*] to render mathematical formulas. This
 documentation will not explain MathJax syntax. However, note that DINTMark uses
-[{\[$}] and [{$\]}] instead of [{$}] at both sides.
+[{\[$}] and [{$\]}] instead of a single [{$}] at both sides.
 As such, the line [{[\$ x^2 + y^y = r^2 \$]}] will render as 
 [$x^2 + y^2 = r^2$].
- Block math (instead of inline math) can be simulated using a [*paraghraph*]
-and a [*center*] block. Thus, this display:
-[:-[$ x^2 + y^2 = r^2 $]-:]
-can be achieved by using [{\[:- [\$ x^2 + y^2 = r^2 \$] -:\]}]. Note that
-there is notation for adding references to formulas. By using [{\[!$ x $!\]}],
+ Block math (instead of inline math) can be simulated using a [*center*] block.
+Thus, this display:
+[:-:[$ x^2 + y^2 = r^2 $]:-:]
+can be achieved by using [{\[:-: [\$ x^2 + y^2 = r^2 \$] :-:\]}].
+ There is notation for adding references to formulas. By using [{\[!$x$!\]}],
 some text can be placed at the right of the formula. As such, the line
-[{\[:- [\$ x^2 + y^2 = r^2 \$] \[!$ (1) $!\] -:\]}] will display as 
-[:-[$x^2 + y^2 = r^2$][!$(1)$!]-:]
+[{\[:-: [\$ x^2 + y^2 = r^2 \$] \[!$ (1) $!\] :-:\]}] will display as 
+[:-:[$x^2 + y^2 = r^2$][!$(1)$!]:-:]
+Perhaps in a future, references will be added automatically.
 
 [##Tables##]
  Tables are a useful way to display data in an ordered way. Markdown does not
-have tables by default, and it implements them in the Markdown Extended Syntax.
+have tables by default, and it implements them in its extended syntax.
 In DINTMark, they are implemented by default, and they use the following syntax:
 [{{
-\[|| This is a header         || This is the second column ||
-|   This is a regular cell   |  This is another cell      |\]
-\[-| Tables can also have captions, and they can also be numbered. Note that it
-can be wider than the table, which is not the HTML default.|-\]
+\[|! This is a header      |! Note that these have a "!" at the beginning |
+\~| This is a regular cell |  This table has two rows and two columns     |\]
+\[-| Tables can also have captions, and they can also be numbered. Note that a
+caption can end up wider than the table, which is not the HTML default.|-\]
 }}]
+
  The given example is rendered as follows:
- [|| This is a header       || This is the second column ||
-|   This is a regular cell |  This is another cell      |]
-[-| Tables can also have captions, and they can also be numbered. Note that it
-can be wider than the table, which is not the HTML default. |-]
- Tables are automatically centered in the page.
+ [|! This is a header       |! Note that these have a "!" at the beginning |
+  | This is a regular cell  |  This table has two rows and two columns     |]
+[-| Tables can also have captions, and they can also be numbered. Note that a
+caption can end up wider than the table, which is not the HTML default.|-]
+
+ Tables are automatically centered in the page. It is not necessary for the
+table markings to be aligned to each other. However, in the example they are
+aligned for aesthetic purposes.
  Table headings are centered by default. Cell contents can be aligned
 horizontally with the following syntax:
 [-
-	-- [{ \[| --: xxx |\] }] will align text to the left.
-	-- [{ \[| :-: xxx |\] }] will align text to the center.
-	-- [{ \[| :-- xxx |\] }] will align text to the right.
+	-- [{ \[| --: TEXT |\] }] will align text to the left.
+	-- [{ \[| :-: TEXT |\] }] will align text to the center.
+	-- [{ \[| :-- TEXT |\] }] will align text to the right.
 -]
  These cells would be rendered as follows:
- [|| Text alignment table||
-| :-- Left-aligned   |
-| :-: Center-aligned |
-| --: Right-aligned  |]
+ [|! Text alignment table|
+  | :-- Left-aligned   |
+  | :-: Center-aligned |
+  | --: Right-aligned  |]
 [#|Text alignment on a table|#]
+
+[###Table formatting###]
+ While this syntax assumes that all tables are a neat grid of cells, this is not
+the reality of all tables. To accomodate for this, a special set of markings can
+be used to change the formatting of the table.
+
+[####Corner cells####]
+ Some tables use headers in the first rows as well as in the first columns. In
+these cases, a group of cells in the corner are left blank and are sometimes not
+even rendered. To denote that a cell is a [*corner cell*], use [{\[CRN\]}].
+ [*An example can be found at the end of the [**Table formatting**] section.*]
+ 
+[####Multirow/multicolumn cells####]
+ Table cells can span more than one row and/or column. Cells that span more than
+one "cell space" are formed by a [*main cell*] and [*extension cells*]. An
+extension cell contains an [*extension marker*] that indicates whether it
+extends the cell [**above**] ([{\[EFA\]}], as in [*Extends From Above*]) or the
+cell [**to its left**] ([{\[EFL\]}], as in [*Extends From Left*]). The rest of
+the cell content is appended to the main cell.
+ Note that when a cell is extended from below, the appended content is printed
+on a new line.
+ [*An example can be found at the end of the [**Table formatting**] section.*]
+ 
+[####Example####]
+ The following example illustrates how both [*corner cells*] and
+[*multirow/multicolumn cells*] are displayed:
+[{{
+\[|  [CRN] This text is not displayed |! This spans  | [EFL] two columns |
+\~|! This spans two                   | :-: -        | :-: -             |
+\~|  [EFA] rows in two lines          | :-: -        | :-: -             |\]
+}}]
+
+ The given example is rendered as follows:
+ [|  [CRN]                   |! This spans  | [EFL] two columns|
+  |! This spans two          | :-: -        | :-: -            |
+  |  [EFA] rows in two lines | :-: -        | :-: -            |]
 
 [##Headers and Footers##]
  [*Headers*] and [*footers*] are sections than are printed on every page.
 Headers are printed at the top of the page, and footers are printed at the
 bottom. To include them in your document, use the following syntax.
-[:-[{ \[H| This is a header, and it appears at the top of every page. |H\]  
-\[F| This is a footer, and it appears at the bottom of every page. |F\] }]-:]
+[:-:[{\[H|TEXT|H\]  
+\[F|TEXT|F\] }]:-:]
  When viewing it on browser, these sections are rendered where they are on the
 source file. Headers are rendered with a light green, dotted border, whereas
 footers are rendered with a red, dashed border. When printing, they will only
@@ -210,17 +273,76 @@ show on the top and bottom of pages, but not in their source file location.
  Do not use more than one header and one footer per document. The behavior in
 this case is not defined. The parser given in the Introduction will render all
 of the defined headers overlapping each other (same for footers).
+ It is common for headers or footers to display an image on one side, and text
+on the other. To allow this, the following syntax can be used:
+[-	-- [{\[--:TEXT--:\]}] causes content to be left aligned.
+	-- [{\[:--TEXT:--\]}] causes content to be right aligned. -]
+While this syntax is technically allowed in any part of the document, note that
+it is [**not**] desgined for use in paragraphs, and in those cases, the result
+is undefined.
 
-[#Options#]
- Having customizability in mind, [**DINTMark**] has a way to allow authors to
-choose between certain formatting functions that apply to the whole document.
-These [*options*] are usually put in the first lines of the text file, and
-follow the following syntax:
-[:-[{\[?xxx=yyy?\]}]-:]
- where [{xxx}] is the option name and [{yyy}] is the value for that option.
+[###Footnotes [_([*not implemented in given parser*])_]###]
+ [*Footnotes*] can also be added to a document. They are like [*footers*], but
+they are only printed on the page they are located. If both a footnote and a
+footer exist, the footnote is printed above the footer.
+ The syntax for adding a footnote is the following:
+[:-:[{\[f|FOOTNOTE|f\]}]:-:]
+ This page has a footnote. In the browser, it will be rendered with a blue,
+solid border. It is located here[f|This is the footer of this page|f]. Note that
+they are meant to be placed inline, as, when printed, they are replaced with a
+superscript number that identifies each footnote.
+ [&red [*Footnotes are not currently implemented in the given parser:
+the print display is the same as the in-browser display.*]&]
+
+[##HTML##]
+ The syntax of [*DINTMark*] has been designed to not interfere with HTML syntax.
+Given that it is expected that a parser will be run in-browser, it stands to
+reason that HTML tags are supported by default.
+
+[#Customizabilty#]
+ A few options are given to authors to ease the formatting of their document.
+
+[##Shorthand##]
+ [*DINTMark*] gives authors a way to easily include custom styles to certain parts
+of text. While the CSS needs to be defined as in an HTML file (that is, using a
+[{&lt;style&gt;}] element), using that stylesheet can be easily done using this
+syntax:
+[:-: [{ \[&XX TEXT&\] }] :-:]
+where [{XX}] is the [*class*] defined in the CSS stylesheet. This is equivalent
+to directly writing
+[:-: [{ &lt;span class="XX"&gt;TEXT&lt;/span&gt; }] :-:]
+ A few classes are included by default in the given parser's stylesheet. The
+following is a full list of the included classes and their effect:
+[-	-- [{blue}] displays text as [&blue blue&]
+	-- [{red}] displays text as [&red red&] -]
+ 
+[##Document options##]
+ These are options that affect the whole document. They are usually put in the
+first lines of the text file, and use the following syntax:
+[:-:[{\[?XXX=YYY?\]}]:-:]
+where [{XXX}] is the option name and [{YYY}] is the value for that option.
  The following options are available:
 [-
 	-- [{justify}] will make the text in paragraphs be justified when set to
 	[{true}]. That means every line, except the last of each paragraph, will
 	span the whole width of the page.
+	-- [{language}] changes the automatic text (such as "[*Figure X.*]" and
+	"[*Table X.*]") to the specified language. Defaults to [{english}]. These
+	are all the languages that the provided parser recognizes:
+	[-	-- [{english}]
+		-- [{spanish}] -]
+	-- [{pageNumbers}] will make it so that the current page number is displayed
+	on each page. The valid values follow a three-character format, [{XYZ}]:
+	[-	-- [{X}] can be [{t}] or [{b}]. This will show the page number on
+		the top or bottom of the page, respectively.
+		-- [{Y}] can be [{l}], [{c}], [{r}] or [{a}]. This will show the page
+		number on the [*left*], [*center*], [*right*], or [*alternate between
+		left and right on each page*], respectively.
+		-- [{Z}] is optional. If set to [{t}], the page number will be displayed
+		as "N/T", where [{N}] is the current page number and [{T}] is the total
+		page count. -]
+	[&red [*[{pageNumbers}] is not currently implemented on the given parser.*]&]
+	-- [{font}] changes the font used in all of the the document, except the
+	sections where [{monospace}] is used. Any value recognized by the browser as
+	a valid [{font-face}] value can be used.
 -]
