@@ -1,0 +1,40 @@
+<style>
+    #input{display:inline-block;border-bottom:solid 1px #666;font-family:monospace;
+        width:50%;resize:none;height:100%;vertical-align:bottom;padding:1rem}
+    #output{display:inline-block;background:#eee;overflow-x:clip;height:calc(100% - 4rem);width:calc(50% - 4rem);
+        overflow-y:scroll;padding:2em;}
+    body{margin:0;height:100vh}
+
+    p{text-indent:2em}
+</style>
+<script>
+    var replaceList=[
+        [/\[\*\*\*(.*?)\*\*\*\]/gm,"<b><i>$1</i></b>"],
+        [/\[\*\*(.*?)\*\*\]/gm,"<b>$1</b>"],
+        [/\[\*(.*?)\*\]/gm,"<i>$1</i>"],
+        [/^ /gm,"<p>"],
+        [/\[=(.*?)=\]/gm,"<h1>$1</h1>"],
+        []
+    ];
+    var i;
+    var o;
+
+    function render(){
+        content=i.value;
+        for(r of replaceList){
+            content=content.replaceAll(r[0],r[1]);
+        }
+        o.innerHTML=content;
+    }
+
+    window.onload=()=>{
+        i=document.getElementById("input")
+        o=document.getElementById("output")
+        i.oninput=()=>{
+            render()
+        }
+    }
+</script>
+<body>
+    <textarea id="input"></textarea><div id="output"></div>
+</body>
