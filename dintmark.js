@@ -43,7 +43,7 @@ matches=[
 	[/\[x/gm,"<ol>"],								[/x\]/gm, "</li></ol>"],		//Ordered lists		
 	[/\[-/gm,"<ul>"],								[/-\]/gm, "</li></ul>"],		//Unordered lists		
 	[/\s+--\s/gm,"</li><li>"],						[/\s+x\.\s/gm,"</li><li>"],		//List items
-	[/^[ ]([^ ])/gm,"<p>$1"],								/*[//g,"<p>"],*/				//<p> blocks
+	[/^[ ]([^ |])/gm,"<p>$1"],								/*[//g,"<p>"],*/				//<p> blocks. Ignores "|" for tables
 	[/\[!\$/gm,"<mathref>"],						[/\$!\]/gm,"</mathref>"],		//<mathref> element (Formula reference)
 	[/\[\[(.*)\]\((.*?)\)\]/gm,"<a href='$1'>$2</a>"],								//<a> element with label
 	[/\[\[(.*)\]\]/gm,"<a href='$1'>$1</a>"],										//<a> element without label

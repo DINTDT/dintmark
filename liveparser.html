@@ -20,9 +20,7 @@
             return c;
         }
 
-        function render(){
-            content=processContent(i);
-            o.innerHTML=content;
+        function numberHeadings(){
             hLevels=[0,0,0,0,0,0]
             ll=6;
             for(var h of document.getElementsByClassName("heading numbered")){
@@ -31,6 +29,22 @@
                 ll=l;
                 hLevels[l-1]+=1;
                 h.innerHTML=hLevels.join(". ").substring(0,l*3)+h.innerHTML;}
+        }
+
+        function processTables(){
+			tables=document.getElementsByTagName("table");
+			tableIndex=0;
+			for (t of tables){
+				t.id="TABLE"+tableIndex;
+				tableIndex+=1;
+				processTableContent(t);};
+        }
+
+        function render(){
+            content=processContent(i);
+            o.innerHTML=content;
+            processTables();
+            numberHeadings();
         }
 
         window.onload=()=>{
