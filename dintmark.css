@@ -1,0 +1,64 @@
+tt {white-space:nowrap}
+pre {page-break-inside:avoid}
+mathref{float:right}
+sub, sup{font-size:0.7em}
+th, td{border:solid black 1px;padding:0.5em 1em;}
+table{margin:1em auto;page-break-inside: avoid;border-collapse:collapse}
+caption, figcaption{caption-side:bottom;font-style:italic;margin:0.5em -25%}
+figure{text-align:center;width:100%;margin:auto;display:inline-block}
+setting{display:none}
+h1{font-size:1.7em}
+h2{font-size:1.4em}
+quote{display:block;margin:1em;margin-left:2em;border-left:0.2em lightgray solid;padding:0.5em}
+center{margin:1em}
+td.th{text-align:center;font-weight:bold;}
+a.figure{color:initial;text-decoration:none}
+
+.sc{font-variant:small-caps}
+.lAlign{text-align:left}
+.cAlign{text-align:center}
+.rAlign{text-align:right}
+.title{font-size:2.2em;text-align:center}
+.justify p{text-align:justify}
+.page{page-break-inside: avoid;}
+.floatRight{position:absolute;right:0;text-align:right;}
+.floatLeft{position:relative;left:0;text-align:left}
+.floatRight figure{display:inline}
+.floatLeft figure{display:inline}
+.footnote{border:dodgerblue 2px solid;}
+.cornerCell{border:none}
+.headerCell{font-weight:bold;text-align:center}
+
+.blue{color:blue}
+.red{color:red}
+
+#headerFooter, #headerFooter > *{border:hidden}
+#headerFooter>tbody>tr>td{padding:0}
+#control{height:10mm}
+#header{border:lightgreen 2px dashed;width:100%;}
+#footer{border:red 2px dotted;width:100%;}
+#header-table{display:none}
+#footer-table{display:none}
+#pageNumber::after{content:counter(page) "/" counter(pages)}
+#pageNumber.tl, #pagenumber.bl {float:left}
+#pageNumber.tc, #pagenumber.bc {float:center}
+#pageNumber.tr, #pagenumber.br {float:right}
+
+@media not print{
+	.page{border-bottom:dotted gray 2px}
+	.dark{background:#202020;color:#e0e0e0}
+	.dark table, .dark th, .dark td{border:solid white 1px}
+}
+@media print{
+	.hasHeader #header-table{display:table-header-group}
+	.hasFooter #footer-table{display:table-footer-group}
+	.hasFooter #footer{position:fixed;bottom:0;left:0;border-style:hidden}
+	.hasHeader #header{position:fixed;top:0;left:0;border-style:hidden}
+	#control{display:none}
+}
+@page{
+	size:letter;
+	margin:20mm 20mm 20mm 20mm;
+	counter-reset:1;
+	counter-increment:page;
+}
