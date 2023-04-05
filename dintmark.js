@@ -71,7 +71,67 @@ tableMatches=[
 
 //MM=document.getElementById("control").offsetHeight/10;
 
-function processContent(c){
+var lang;
+var settings={};
+
+function processContent(e){
+	var c=e.value;
+	for(match of matches){c=c.replace(match[0],match[1]);}
+	return c;
+}
+
+function processOptions(){
+	for(s of document.getElementsByTagName("setting")){
+		setting=s.innerHTML.split("=");
+		settings[setting[0]]=setting[1];}
+	lang=settings["language"]&&I18N[settings["language"]]?settings["language"]:"english";
+	o.style.fontFamily=settings["font"]?settings["font"]:"serif";
+	if(settings["justify"]=="true")o.classList.add("justify");
+}
+
+function numberHeadings(){
+	hLevels=[0,0,0,0,0,0]
+	ll=6;
+	for(var h of document.getElementsByClassName("heading numbered")){
+		var l=parseInt(h.tagName.substring(1));
+		if(l<ll){for(var li=l;li<6;li++){hLevels[li]=0}}
+		ll=l;
+		hLevels[l-1]+=1;
+		h.innerHTML=hLevels.join(". ").substring(0,l*3)+h.innerHTML;}
+}
+
+function processTables(){
+	tables=document.getElementsByTagName("table");
+	tableIndex=0;
+	for (t of tables){
+		t.id="TABLE"+tableIndex;
+		tableIndex+=1;
+		processTableContent(t);};
+}
+
+function processCaptions(){
+	csT=0; csI=0;
+	captions=document.getElementsByClassName("caption");
+	for(c of captions){
+		t=c.previousElementSibling;
+		if(t&&t.tagName=="TABLE"){
+			newC=document.createElement("caption");
+			if(c.classList.contains("numbered")){csT+=1; c.innerHTML=I18N[lang]["TABLE"].replace("{x}",csT)+c.innerHTML;}
+			newC.innerHTML=c.innerHTML;
+			t.insertBefore(newC,t.firstElementChild);}
+		else if(t&&(t.tagName=="FIGURE"||t.tagName=="A")){
+			if(t.tagName=="A" && t.firstElementChild && t.firstElementChild.tagName=="FIGURE"){
+				t.classList.add("figure");
+				t=t.firstElementChild;}
+			newC=document.createElement("figcaption");
+			if(c.classList.contains("numbered")){csI+=1; c.innerHTML=I18N[lang]["FIGURE"].replace("{x}",csI)+c.innerHTML;}
+			newC.innerHTML=c.innerHTML;
+			t.appendChild(newC);
+		}
+		c.style.display="none";
+	}
+}
+function processContentFromFile(c){
 	for(match of matches){c=c.replace(match[0],match[1]);}
 	return c;
 }
@@ -129,7 +189,7 @@ function handleFileSelect(evt) {
 	reader.onload = (function(theFile) {
 		return function(e) {
 			//Handle most marking conversions
-			c=processContent(e.target.result);
+			c=processContentFromFile(e.target.result);
 			document.getElementById("content").innerHTML="<div class='page'>"+c+"</div>";
 			//Handle MathJax conversion
 			MathJax.typeset();
