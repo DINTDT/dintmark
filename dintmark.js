@@ -36,7 +36,8 @@ matches=[
 	[/\[#/gm,"<h1 class='numbered heading'>"],		[/#\]/gm,"</h1>"],				//<h1> tags: numbered
 	[/\["/gm,"<quote>"],							[/"\]/gm,"</quote>"],			//<quote> tags
 	[/\[\{\{/gm,"<pre>"],							[/\}\}\]/gm,"</pre>"],			//<pre> block
-	[/\[\{/gm,"<tt>"],								[/\}\]/gm,"</tt>"],				//<tt> tags
+	[/\[\'/gm,"<tt>"],								[/\'\]/gm,"</tt>"],				//<tt> tags
+	[/\[\{/gm,"<script class='user-defined'>"],		[/\}\]/gm,"</script>"],			//<script> tags
 	[/\[:-:/gm,"<center>"],							[/:-:\]/gm,"</center>"],		//<center> blocks
 	[/\[:--/gm,"<span class='floatRight'>"],		[/:--\]/gm,"</span>"],			//right floating blocks
 	[/\[--:/gm,"<span class='floatLeft'>"],			[/--:\]/gm,"</span>"],			//left floating blocks
@@ -74,6 +75,21 @@ tableMatches=[
 var lang;
 var settings={};
 
+var currentUserScriptId=null;
+var lastEchoID=0;
+var lastUserScriptID=0;
+
+//To be used within user script blocks.
+function echo(str){
+	ps=document.getElementById(currentUserScriptId);
+	holder=document.createElement("span");
+	holder.classList.add("echoed");
+	holder.id="echo_"+(lastEchoID+1);
+	lastEchoID+=1;
+	holder.innerHTML+=str;
+	ps.parentElement.insertBefore(holder,ps)
+}
+
 function processContent(e){
 	var c=e.value;
 	for(match of matches){c=c.replace(match[0],match[1]);}
@@ -87,6 +103,16 @@ function processOptions(){
 	lang=settings["language"]&&I18N[settings["language"]]?settings["language"]:"english";
 	o.style.fontFamily=settings["font"]?settings["font"]:"serif";
 	if(settings["justify"]=="true")o.classList.add("justify");
+}
+
+function executeScripts(){
+	for(ps of document.querySelectorAll("script.user-defined")){
+		ps.id="userscript_"+lastUserScriptID;
+		lastUserScriptID+=1;
+		currentUserScriptId=ps.id;
+		code=ps.innerText.replaceAll(/^[ ]*<p>/gm,"");
+		eval(code);
+	}
 }
 
 function numberHeadings(){
