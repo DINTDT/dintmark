@@ -88,6 +88,20 @@ function echo(str){
 	lastEchoID+=1;
 	holder.innerHTML+=str;
 	ps.parentElement.insertBefore(holder,ps)
+	return holder.id;
+}
+
+function plot(data){
+	var height=data["height"]==null?300:data["height"];
+	var width=data["width"]==null?400:data["width"];
+	echo("<canvas class='plot' height='"+height+"' width='"+width+"'></canvas>");
+	var canvas = document.getElementById("echo_"+lastEchoID).children[0];
+	canvas.id="canvas_"+lastEchoID;
+	var hwRatio = height/width;
+	canvas.style.height=canvas.clientWidth*hwRatio
+	var ctx=canvas.getContext('2d');
+	ctx.fillStyle="#FF0000";
+	ctx.fillRect(0,0,width,height)
 }
 
 function processContent(e){
@@ -297,6 +311,8 @@ function handleFileSelect(evt) {
 				if(currP.innerHTML.trim()==""){currP.remove();r+=1;}
 				else{i-=1;}
 			}
+			//execute user-defined script blocks
+			executeScripts();
 		};
 	})(f);
 	reader.readAsText(f);

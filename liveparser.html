@@ -15,6 +15,9 @@
         var o;
         
         function render(){
+            currentUserScriptId=null;
+            lastEchoID=0;
+            lastUserScriptID=0;
             content=processContent(i);
             o.innerHTML=content;
             processOptions();
