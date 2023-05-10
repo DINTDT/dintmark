@@ -92,13 +92,16 @@ function echo(str){
 }
 
 function plot(data){
+	var center=data["center"]==null?true:data["center"];
+	var scale=data["scale"]==null?100:data["scale"];
 	var height=data["height"]==null?300:data["height"];
 	var width=data["width"]==null?400:data["width"];
 	echo("<canvas class='plot' height='"+height+"' width='"+width+"'></canvas>");
 	var canvas = document.getElementById("echo_"+lastEchoID).children[0];
 	canvas.id="canvas_"+lastEchoID;
+	canvas.style.width=scale+"%";
 	var hwRatio = height/width;
-	canvas.style.height=canvas.clientWidth*hwRatio
+	canvas.style.aspectRation=hwRatio
 	var ctx=canvas.getContext('2d');
 	ctx.fillStyle="#FF0000";
 	ctx.fillRect(0,0,width,height)
