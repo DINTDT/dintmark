@@ -96,6 +96,17 @@ function plot(data){
 	var scale=data["scale"]==null?100:data["scale"];
 	var height=data["height"]==null?300:data["height"];
 	var width=data["width"]==null?400:data["width"];
+	var paddingLeft=data["paddingLeft"]==null?width*0.1:data["paddingLeft"];
+	var paddingRight=data["paddingRight"]==null?width*0.1:data["paddingRight"];
+	var paddingTop=data["paddingTop"]==null?height*0.2:data["paddingTop"];
+	var paddingBottom=data["paddingBottom"]==null?height*0.1:data["paddingBottom"];
+	var labelSize=data["labelSize"]==null?height*0.06:data["labelSize"];
+	var x=data["x"];
+	var y=data["y"]
+	//var xBreadth=x.slice(-1)-x[0];
+	var xBreadth=Math.max(...x)
+	//var yBreadth=y.slice(-1)-y[0];
+	var yBreadth=Math.max(...y)
 	/*
 	var caption=data["caption"];
 	var numberCaption=data["numberCaption"]==null?false:data["numberCaption"]
@@ -122,8 +133,41 @@ function plot(data){
 	var hwRatio = height/width;
 	canvas.style.aspectRation=hwRatio
 	var ctx=canvas.getContext('2d');
-	ctx.fillStyle="#FF0000";
-	ctx.fillRect(0,0,width,height)
+	ctx.fillStyle="#DDD";
+	ctx.fillRect(0,0,width,height);
+	ctx.fillStyle="#111";
+	ctx.moveTo(paddingLeft,height-paddingBottom);
+	ctx.lineTo(paddingLeft,paddingTop);
+	ctx.moveTo(paddingLeft,height-paddingBottom);
+	ctx.lineTo(width-paddingRight,height-paddingBottom);
+	ctx.stroke();
+	ctx.font = labelSize+"px Arial";
+	ctx.textAlign = "center"
+	//draw horizontal labels
+	var labelValue = 0;
+	var columnsNum = Math.floor((width-paddingLeft-paddingRight)/labelSize); //number of columns to draw
+	if(columnsNum > xBreadth) columnsNum=xBreadth;
+	var columnValStep = xBreadth/columnsNum; //difference in value between adjacent columns
+	var columnDrawStep = (width-paddingLeft-paddingRight)/columnsNum; //distance between each label
+	for(var c=0;c<=columnsNum;c++){
+		ctx.fillText(Math.round(labelValue), paddingLeft+(c*columnDrawStep), height-paddingBottom+labelSize);
+		labelValue+=columnValStep;
+	}
+	//draw vertical labels
+	var labelValue = 0;
+	var rowsNum = Math.floor((height-paddingTop-paddingBottom)/labelSize); //number of rows to draw
+	if(rowsNum> yBreadth) rowsNum=yBreadth;
+	var rowValStep = yBreadth/rowsNum; //difference in value between adjacent columns
+	var rowDrawStep = (height-paddingTop-paddingBottom)/rowsNum; //distance between each label
+	for(var r=0;r<=rowsNum;r++){
+		ctx.fillText(Math.round(labelValue), paddingLeft-labelSize, height-paddingBottom-(r*rowDrawStep)+(labelSize*0.3));
+		labelValue+=rowValStep;
+	}
+	//draw x labels
+	//draw y labels
+	//for each value in x
+	//	calc renderX and renderY for its point, using x, y, and the canvas' height and width
+	//	draw a point at renderX, renderY
 }
 
 function processContent(e){
@@ -194,7 +238,6 @@ function processCaptions(){
 		}
 		else if(t.tagName=="SCRIPT" && t.classList.contains("hasPlot")){
 			var scriptNum=t.dataset["scriptNumber"];
-			console.log(scriptNum)
 			var figure=document.getElementById("plotfigure_"+scriptNum)
 			newC=document.createElement("figcaption");
 			if(c.classList.contains("numbered")){csI+=1; c.innerHTML=I18N[lang]["FIGURE"].replace("{x}",csI)+c.innerHTML;}
