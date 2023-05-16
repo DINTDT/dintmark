@@ -92,12 +92,31 @@ function echo(str){
 }
 
 function plot(data){
-	var center=data["center"]==null?true:data["center"];
+	document.getElementById(currentUserScriptId).classList.add("hasPlot");
 	var scale=data["scale"]==null?100:data["scale"];
 	var height=data["height"]==null?300:data["height"];
 	var width=data["width"]==null?400:data["width"];
-	echo("<canvas class='plot' height='"+height+"' width='"+width+"'></canvas>");
-	var canvas = document.getElementById("echo_"+lastEchoID).children[0];
+	/*
+	var caption=data["caption"];
+	var numberCaption=data["numberCaption"]==null?false:data["numberCaption"]
+	*/
+	echo("<figure id='plotfigure_"+(lastUserScriptID-1)+"'></figure>");
+	var figure=document.getElementById("plotfigure_"+(lastUserScriptID-1));
+	var canvas=document.createElement("canvas");
+	figure.appendChild(canvas);
+	canvas.classList.add("canvas");
+	/*
+	if(caption!=null){
+		var captionElement = document.createElement("figcaption");
+		figure.appendChild(captionElement);
+		if(numberCaption){
+			csI+=1;
+			captionElement.innerHTML=I18N[lang]["FIGURE"].replace("{x}",csI)+caption;}
+		else captionElement.innerText=caption;
+	}
+	*/
+	canvas.setAttribute("height",height)
+	canvas.setAttribute("width",width)
 	canvas.id="canvas_"+lastEchoID;
 	canvas.style.width=scale+"%";
 	var hwRatio = height/width;
@@ -125,6 +144,7 @@ function processOptions(){
 function executeScripts(){
 	for(ps of document.querySelectorAll("script.user-defined")){
 		ps.id="userscript_"+lastUserScriptID;
+		ps.dataset["scriptNumber"]=lastUserScriptID;
 		lastUserScriptID+=1;
 		currentUserScriptId=ps.id;
 		code=ps.innerText.replaceAll(/^[ ]*<p>/gm,"");
@@ -157,12 +177,13 @@ function processCaptions(){
 	captions=document.getElementsByClassName("caption");
 	for(c of captions){
 		t=c.previousElementSibling;
-		if(t&&t.tagName=="TABLE"){
+		if(!t)continue;
+		if(t.tagName=="TABLE"){
 			newC=document.createElement("caption");
 			if(c.classList.contains("numbered")){csT+=1; c.innerHTML=I18N[lang]["TABLE"].replace("{x}",csT)+c.innerHTML;}
 			newC.innerHTML=c.innerHTML;
 			t.insertBefore(newC,t.firstElementChild);}
-		else if(t&&(t.tagName=="FIGURE"||t.tagName=="A")){
+		else if(t.tagName=="FIGURE"||t.tagName=="A"){
 			if(t.tagName=="A" && t.firstElementChild && t.firstElementChild.tagName=="FIGURE"){
 				t.classList.add("figure");
 				t=t.firstElementChild;}
@@ -171,9 +192,19 @@ function processCaptions(){
 			newC.innerHTML=c.innerHTML;
 			t.appendChild(newC);
 		}
+		else if(t.tagName=="SCRIPT" && t.classList.contains("hasPlot")){
+			var scriptNum=t.dataset["scriptNumber"];
+			console.log(scriptNum)
+			var figure=document.getElementById("plotfigure_"+scriptNum)
+			newC=document.createElement("figcaption");
+			if(c.classList.contains("numbered")){csI+=1; c.innerHTML=I18N[lang]["FIGURE"].replace("{x}",csI)+c.innerHTML;}
+			newC.innerHTML=c.innerHTML;
+			figure.appendChild(newC);
+		}
 		c.style.display="none";
 	}
 }
+
 function processContentFromFile(c){
 	for(match of matches){c=c.replace(match[0],match[1]);}
 	return c;
