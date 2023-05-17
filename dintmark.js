@@ -140,6 +140,7 @@ function plot(data){
 	ctx.lineTo(paddingLeft,paddingTop);
 	ctx.moveTo(paddingLeft,height-paddingBottom);
 	ctx.lineTo(width-paddingRight,height-paddingBottom);
+	ctx.closePath();
 	ctx.stroke();
 	ctx.font = labelSize+"px Arial";
 	ctx.textAlign = "center"
@@ -156,18 +157,22 @@ function plot(data){
 	//draw vertical labels
 	var labelValue = 0;
 	var rowsNum = Math.floor((height-paddingTop-paddingBottom)/labelSize); //number of rows to draw
-	if(rowsNum> yBreadth) rowsNum=yBreadth;
+	if(rowsNum > yBreadth) rowsNum=yBreadth;
 	var rowValStep = yBreadth/rowsNum; //difference in value between adjacent columns
 	var rowDrawStep = (height-paddingTop-paddingBottom)/rowsNum; //distance between each label
 	for(var r=0;r<=rowsNum;r++){
 		ctx.fillText(Math.round(labelValue), paddingLeft-labelSize, height-paddingBottom-(r*rowDrawStep)+(labelSize*0.3));
 		labelValue+=rowValStep;
 	}
-	//draw x labels
-	//draw y labels
-	//for each value in x
-	//	calc renderX and renderY for its point, using x, y, and the canvas' height and width
-	//	draw a point at renderX, renderY
+	ctx.fillStyle = "#333";
+	if(x.length<=y.length){
+		for(var i=0;i<x.length;i++){
+			ctx.beginPath();
+			ctx.arc(paddingLeft+(x[i]*columnDrawStep), height-paddingBottom-(y[i]*rowDrawStep), labelSize*0.2, 0 , 2 * Math.PI);
+			ctx.closePath();
+			ctx.fill();
+		}
+	}
 }
 
 function processContent(e){

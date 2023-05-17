@@ -5,7 +5,7 @@ sub, sup{font-size:0.7em}
 th, td{border:solid black 1px;padding:0.5em 1em;}
 table{margin:1em auto;page-break-inside: avoid;border-collapse:collapse}
 caption, figcaption{caption-side:bottom;font-style:italic;margin:0.5em -25%}
-figure{text-align:center;width:100%;margin:auto;display:inline-block}
+figure{text-align:center;width:100%;margin:auto;display:inline-block;margin-top:1em}
 setting{display:none}
 h1{font-size:1.7em}
 h2{font-size:1.4em}
